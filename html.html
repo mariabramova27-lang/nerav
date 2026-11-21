@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📐 Треугольники: магия неравенства · Мягкая математика</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700;900&display=swap');
+
+  :root{
+    --bg1:#1a0f2e; --bg2:#0a0518;
+    --p1:#8b5cf6; --p2:#ff8fb1; --cyan:#22d3ee; --gold:#ffce54;
+    --ok:#4ade80; --err:#ff6b6b; --warn:#f59e0b;
+    --ink:#e0d8ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:'Segoe Print','Comfortaa','Comic Sans MS',cursive,sans-serif;
+    background:
+      radial-gradient(ellipse at top left,#2a1a4a 0%,transparent 60%),
+      radial-gradient(ellipse at bottom right,#0a0518 0%,transparent 60%),
+      linear-gradient(180deg,var(--bg1),var(--bg2));
+    background-attachment:fixed;
+    color:var(--ink);
+    padding:20px 16px 100px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ================================================================
+     ФОН: диагональный водяной знак (очень мягкий)
+  ================================================================ */
+  .bg-watermark{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+    opacity:.055;
+    user-select:none;
+  }
+  .bg-wm-line{
+    position:absolute;
+    white-space:nowrap;
+    font-family:'Comfortaa',sans-serif;
+    font-weight:900;
+    font-size:22px;
+    letter-spacing:5px;
+    color:var(--gold);
+    text-transform:uppercase;
+    transform:rotate(-25deg);
+    transform-origin:left center;
+  }
+  .bg-wm-line .dot-sep{
+    color:var(--p2);
+    margin:0 14px;
+    opacity:.7;
+  }
+  .bg-wm-line a{
+    color:inherit;
+    text-decoration:none;
+    pointer-events:auto;
+  }
+
+  /* ================================================================
+     ФОН: плавающие мини-фигуры (снизу вверх)
+  ================================================================ */
+  .bg-particles{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+  }
+  .bg-fig{
+    position:absolute;
+    bottom:-80px;
+    font-family:'Comfortaa',sans-serif;
+    font-weight:900;
+    will-change:transform;
+    animation-name:figureFloat;
+    animation-timing-function:linear;
+    animation-iteration-count:infinite;
+    opacity:0;
+    text-shadow:0 0 12px currentColor;
+    line-height:1;
+  }
+  @keyframes figureFloat{
+    0%{
+      transform:translate3d(0,0,0) rotate(0deg);
+      opacity:0;
+    }
+    8%{
+      opacity:var(--op,.14);
+    }
+    92%{
+      opacity:var(--op,.14);
+    }
+    100%{
+      transform:
+        translate3d(var(--drift,50px), calc(-100vh - 120px), 0)
+        rotate(var(--rot,360deg));
+      opacity:0;
+    }
+  }
+
+  .app{max-width:1180px;margin:0 auto;position:relative;z-index:2}
+
+  /* ================================================================
+     УГЛОВАЯ РЕКЛАМА (правый нижний угол)
+  ================================================================ */
+  .corner-ad{
+    position:fixed;
+    right:14px;
+    bottom:14px;
+    z-index:10;
+    max-width:250px;
+    background:linear-gradient(135deg,rgba(42,26,74,.88),rgba(10,5,24,.92));
+    border:1px solid rgba(139,92,246,.35);
+    border-radius:14px;
+    padding:12px 14px;
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    box-shadow:0 10px 30px rgba(0,0,0,.45);
+    opacity:.55;
+    transition:opacity .3s ease, transform .3s ease;
+    font-family:'Comfortaa',sans-serif;
+    font-size:12px;
+    line-height:1.5;
+  }
+  .corner-ad:hover{
+    opacity:1;
+    transform:translateY(-2px);
+  }
+  .corner-ad-tag{
+    font-size:9.5px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:5px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+  }
+  .corner-ad-tag::before{
+    content:"";
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--ok);
+    box-shadow:0 0 8px var(--ok);
+    animation:pulseDot 2s ease-in-out infinite;
+  }
+  @keyframes pulseDot{
+    0%,100%{opacity:1}
+    50%{opacity:.4}
+  }
+  .corner-ad-title{
+    color:#fff;
+    font-weight:900;
+    font-size:12.5px;
+    line-height:1.3;
+    margin-bottom:4px;
+  }
+  .corner-ad-text{
+    color:rgba(224,216,255,.75);
+    font-size:10.5px;
+    margin-bottom:8px;
+  }
+  .corner-ad-links{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+  }
+  .corner-ad-links a{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:5px 9px;
+    background:rgba(139,92,246,.18);
+    border:1px solid rgba(139,92,246,.35);
+    border-radius:8px;
+    color:#fff;
+    font-size:10.5px;
+    font-weight:900;
+    text-decoration:none;
+    transition:all .2s;
+    line-height:1.3;
+  }
+  .corner-ad-links a:hover{
+    background:rgba(139,92,246,.35);
+    border-color:var(--p1);
+    transform:translateX(2px);
+  }
+  .corner-ad-links a.primary{
+    background:linear-gradient(135deg,var(--gold),#f59e0b);
+    border-color:var(--gold);
+    color:#1a0f2e;
+  }
+  .corner-ad-links a.primary:hover{
+    filter:brightness(1.08);
+    border-color:var(--gold);
+  }
+  .corner-ad-close{
+    position:absolute;
+    top:5px;right:7px;
+    width:16px;height:16px;
+    border-radius:50%;
+    background:rgba(255,255,255,.1);
+    border:none;
+    color:rgba(255,255,255,.6);
+    font-size:11px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    line-height:1;
+    transition:all .2s;
+  }
+  .corner-ad-close:hover{
+    background:rgba(255,107,107,.3);
+    color:#fff;
+  }
+  .corner-ad.collapsed{
+    max-width:40px;
+    padding:8px;
+    opacity:.4;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .corner-ad.collapsed .corner-ad-tag,
+  .corner-ad.collapsed .corner-ad-title,
+  .corner-ad.collapsed .corner-ad-text,
+  .corner-ad.collapsed .corner-ad-links,
+  .corner-ad.collapsed .corner-ad-close{
+    display:none;
+  }
+  .corner-ad.collapsed::before{
+    content:"💬";
+    font-size:18px;
+  }
+  .corner-ad.collapsed:hover{
+    opacity:1;
+  }
+
+  @media(max-width:820px){
+    .corner-ad{
+      max-width:220px;
+      font-size:11px;
+      bottom:10px;
+      right:10px;
+    }
+  }
+  @media(max-width:520px){
+    .corner-ad{
+      max-width:180px;
+    }
+  }
+
+  /* ================================================================
+     ОСНОВНОЙ КОНТЕНТ
+  ================================================================ */
+  header{text-align:center;margin-bottom:22px}
+  header h1{
+    font-size:clamp(1.4em,3.5vw,2.2em);
+    color:#fff;letter-spacing:-0.5px;
+  }
+  header h1 span{
+    background:linear-gradient(90deg,var(--p1),var(--p2),var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  header p{opacity:.7;margin-top:8px;font-size:.95em}
+
+  .scorebar{
+    display:flex;justify-content:center;gap:10px;
+    flex-wrap:wrap;margin-top:14px;
+  }
+  .score-chip{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(139,92,246,.3);
+    padding:6px 14px;border-radius:20px;
+    font-size:.82em;font-weight:900;
+    display:flex;align-items:center;gap:6px;
+  }
+  .score-chip b{color:var(--gold);font-size:1.15em}
+  .score-chip.streak b{color:var(--cyan)}
+  .score-chip.medal b{color:var(--p2)}
+
+  .grid{display:grid;grid-template-columns:1.15fr 1fr;gap:20px}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(139,92,246,.3);
+    border-radius:20px;
+    padding:20px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 10px 40px rgba(0,0,0,.3);
+    position:relative;
+  }
+
+  h2{
+    font-size:1em;color:#fff;margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  h2 small{font-size:.72em;opacity:.6;font-weight:400;margin-left:4px}
+
+  .challenge-bar{
+    background:linear-gradient(135deg, rgba(139,92,246,.2), rgba(255,143,177,.15));
+    border:2px solid var(--p1);
+    border-radius:16px;
+    padding:14px 18px;
+    margin-bottom:16px;
+    display:none;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    justify-content:center;
+    animation:slideDown .4s ease;
+  }
+  .challenge-bar.show{display:flex}
+  @keyframes slideDown{
+    from{opacity:0;transform:translateY(-15px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  .challenge-bar .cb-text{
+    flex:1;min-width:200px;
+    font-size:.92em;font-weight:700;
+    color:#fff;
+  }
+  .challenge-bar .cb-text b{color:var(--gold)}
+  .predict-btn{
+    padding:9px 18px;border:none;border-radius:12px;
+    font-family:inherit;font-size:.85em;font-weight:900;
+    cursor:pointer;transition:all .2s;
+    color:#fff;
+  }
+  .predict-btn.yes{
+    background:linear-gradient(135deg,var(--ok),#22c55e);
+    box-shadow:0 4px 16px rgba(74,222,128,.4);
+  }
+  .predict-btn.no{
+    background:linear-gradient(135deg,var(--err),#dc2626);
+    box-shadow:0 4px 16px rgba(255,107,107,.4);
+  }
+  .predict-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .predict-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;filter:none}
+
+  .viz{
+    aspect-ratio:4/3;
+    background:linear-gradient(180deg,rgba(42,26,74,.5),rgba(10,5,24,.7));
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:inset 0 0 40px rgba(0,0,0,.5);
+    position:relative;
+  }
+  .viz svg{display:block;width:100%;height:100%}
+
+  .status{
+    margin-top:14px;
+    padding:14px 18px;
+    border-radius:14px;
+    font-size:.95em;
+    font-weight:700;
+    text-align:center;
+    line-height:1.5;
+    transition:all .35s ease;
+  }
+  .status.ok{background:rgba(74,222,128,.12);border:2px solid var(--ok);color:var(--ok)}
+  .status.err{background:rgba(255,107,107,.12);border:2px solid var(--err);color:var(--err)}
+  .status.warn{background:rgba(245,158,11,.12);border:2px solid var(--warn);color:var(--warn)}
+  .status.prediction{background:rgba(139,92,246,.15);border:2px dashed var(--p1);color:#fff}
+  .status.result-correct{animation:resultPop .5s ease}
+  .status.result-wrong{animation:resultPop .5s ease}
+  @keyframes resultPop{
+    0%{transform:scale(0.9)}
+    50%{transform:scale(1.05)}
+    100%{transform:scale(1)}
+  }
+
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .info-item{
+    background:rgba(255,255,255,.04);
+    border-radius:12px;
+    padding:12px 8px;
+    text-align:center;
+    min-height:60px;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .info-item .label{
+    font-size:.7em;opacity:.6;margin-bottom:5px;
+    text-transform:uppercase;letter-spacing:.5px;
+  }
+  .info-item .value{
+    font-size:.9em;font-weight:900;line-height:1.3;
+  }
+  .type-badge{
+    display:inline-block;
+    padding:3px 9px;border-radius:12px;
+    font-size:.75em;font-weight:900;white-space:nowrap;
+  }
+  .type-badge.sides{background:rgba(34,211,238,.2);color:var(--cyan);border:1px solid rgba(34,211,238,.5)}
+  .type-badge.angles{background:rgba(255,143,177,.2);color:var(--p2);border:1px solid rgba(255,143,177,.5)}
+  .ineq-row{
+    font-family:'Comfortaa',sans-serif;
+    font-size:.85em;font-weight:900;
+    display:flex;align-items:center;gap:6px;
+    justify-content:center;margin:2px 0;
+  }
+  .ineq-row .ok-mark{color:var(--ok)}
+  .ineq-row .err-mark{color:var(--err)}
+
+  .slider-group{margin:16px 0}
+  .slider-label{
+    display:flex;justify-content:space-between;align-items:center;
+    font-weight:700;margin-bottom:8px;font-size:.92em;
+  }
+  .slider-label .dot{
+    display:inline-block;width:12px;height:12px;border-radius:50%;
+    margin-right:6px;vertical-align:middle;
+  }
+  .slider-label .val{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.15);
+    color:#fff;
+    padding:3px 12px;border-radius:20px;
+    min-width:54px;text-align:center;
+    font-size:.9em;font-weight:900;
+    font-family:'Comfortaa',sans-serif;
+  }
+  input[type=range]{
+    width:100%;-webkit-appearance:none;
+    height:8px;background:rgba(255,255,255,.1);
+    border-radius:10px;outline:none;cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:24px;height:24px;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    border-radius:50%;cursor:grab;
+    box-shadow:0 0 14px rgba(139,92,246,.8);
+    transition:transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15)}
+  input[type=range]::-moz-range-thumb{
+    width:24px;height:24px;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    border:none;border-radius:50%;cursor:grab;
+  }
+
+  .presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .preset{
+    padding:7px 13px;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:20px;
+    color:var(--ink);font-family:inherit;
+    font-size:.82em;font-weight:700;cursor:pointer;
+    transition:all .2s;
+  }
+  .preset:hover{
+    background:rgba(139,92,246,.35);
+    border-color:var(--p1);
+    transform:translateY(-2px);color:#fff;
+  }
+  .preset.bad{border-color:rgba(255,107,107,.4)}
+  .preset.bad:hover{background:rgba(255,107,107,.25);border-color:var(--err)}
+
+  .history{
+    max-height:180px;overflow-y:auto;
+    margin-top:8px;padding-right:4px;
+  }
+  .history::-webkit-scrollbar{width:6px}
+  .history::-webkit-scrollbar-thumb{background:rgba(139,92,246,.4);border-radius:3px}
+  .history-item{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:7px 11px;border-radius:8px;margin-bottom:5px;
+    font-size:.82em;
+    background:rgba(255,255,255,.04);
+    transition:all .2s;
+  }
+  .history-item.ok{border-left:3px solid var(--ok)}
+  .history-item.err{border-left:3px solid var(--err)}
+  .history-item.warn{border-left:3px solid var(--warn)}
+  .history-item.predicted{border-left:3px solid var(--p1);background:rgba(139,92,246,.08)}
+  .history-item .hi-tag{font-size:.85em;opacity:.7}
+
+  .btn{
+    padding:11px 22px;
+    background:linear-gradient(135deg,var(--p1),var(--p2));
+    border:none;border-radius:12px;
+    color:#fff;font-family:inherit;
+    font-size:.9em;font-weight:900;cursor:pointer;
+    box-shadow:0 4px 20px rgba(139,92,246,.35);
+    transition:all .2s;
+    width:100%;margin-top:14px;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(139,92,246,.55)}
+  .btn.secondary{
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow:none;
+  }
+  .btn.secondary:hover{background:rgba(255,255,255,.15);box-shadow:none}
+
+  .hint{
+    margin-top:12px;padding:10px 14px;
+    background:rgba(255,206,84,.08);
+    border-left:3px solid var(--gold);
+    border-radius:8px;
+    font-size:.82em;line-height:1.55;
+  }
+  .hint b{color:var(--gold)}
+
+  /* Ad-card внутри карточки (существующая) */
+  .ad-card{
+    margin-top:20px;
+    background:linear-gradient(135deg, rgba(139,92,246,.18), rgba(255,143,177,.12));
+    border:1px solid rgba(255,143,177,.35);
+    border-radius:16px;
+    padding:18px 20px;
+    position:relative;
+    overflow:hidden;
+    display:none;
+  }
+  .ad-card.show{display:block;animation:slideDown .5s ease}
+  .ad-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:3px;
+    background:linear-gradient(90deg,var(--p1),var(--p2),var(--gold));
+  }
+  .ad-card .ad-tag{
+    font-size:.68em;font-weight:900;
+    color:var(--gold);text-transform:uppercase;
+    letter-spacing:1.2px;margin-bottom:6px;
+  }
+  .ad-card .ad-title{
+    font-size:1.02em;font-weight:900;color:#fff;
+    margin-bottom:8px;line-height:1.35;
+  }
+  .ad-card .ad-text{
+    font-size:.85em;line-height:1.55;opacity:.85;
+    margin-bottom:12px;
+  }
+  .ad-card .ad-cta{
+    display:inline-block;
+    padding:8px 16px;
+    background:linear-gradient(135deg,var(--gold),#f59e0b);
+    color:#1a0f2e;
+    border-radius:12px;
+    text-decoration:none;
+    font-size:.82em;font-weight:900;
+    transition:all .2s;
+  }
+  .ad-card .ad-cta:hover{transform:translateY(-2px);filter:brightness(1.1)}
+
+  .footer-ad{
+    margin-top:24px;
+    text-align:center;
+    padding:16px;
+    font-size:.78em;
+    opacity:.65;
+    line-height:1.7;
+  }
+  .footer-ad b{color:var(--gold);font-weight:900;opacity:1}
+  .footer-ad a{color:var(--p2);text-decoration:none;border-bottom:1px dashed currentColor;transition:all .2s}
+  .footer-ad a:hover{color:#fff;border-bottom-style:solid}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,5,24,.85);
+    backdrop-filter:blur(6px);z-index:100;
+    display:none;align-items:center;justify-content:center;padding:20px;
+  }
+  .modal-overlay.show{display:flex;animation:fadeIn .3s ease}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal{
+    background:linear-gradient(180deg,#2a1a4a,#1a0f2e);
+    border:2px solid var(--p1);
+    border-radius:24px;
+    padding:32px 28px;
+    max-width:520px;width:100%;
+    text-align:center;
+    position:relative;
+    box-shadow:0 25px 60px rgba(0,0,0,.6);
+    animation:modalPop .4s cubic-bezier(.34,1.56,.64,1);
+    max-height:90vh;overflow-y:auto;
+  }
+  @keyframes modalPop{
+    from{transform:scale(.85);opacity:0}
+    to{transform:scale(1);opacity:1}
+  }
+  .modal .medal-big{font-size:64px;margin-bottom:10px;display:inline-block;animation:floatMedal 2.5s ease-in-out infinite}
+  @keyframes floatMedal{
+    0%,100%{transform:translateY(0) rotate(-3deg)}
+    50%{transform:translateY(-8px) rotate(3deg)}
+  }
+  .modal h3{
+    font-size:1.5em;color:#fff;margin-bottom:6px;
+    background:linear-gradient(135deg,var(--gold),var(--p2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .modal .modal-sub{font-size:.9em;opacity:.8;margin-bottom:18px}
+  .modal .modal-stats{
+    display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;
+    margin:16px 0;
+  }
+  .modal .stat-box{
+    background:rgba(255,255,255,.06);
+    border-radius:12px;padding:12px 6px;text-align:center;
+  }
+  .modal .stat-box .lbl{font-size:.65em;opacity:.6;text-transform:uppercase;margin-bottom:4px;letter-spacing:.5px}
+  .modal .stat-box .v{font-size:1.4em;font-weight:900;color:var(--gold);font-family:'Comfortaa',sans-serif}
+  .modal .modal-msg{
+    font-size:.9em;line-height:1.6;
+    padding:14px;border-radius:12px;
+    background:rgba(74,222,128,.1);
+    border:1px solid rgba(74,222,128,.3);
+    color:#fff;margin-bottom:18px;
+  }
+
+  .stars-explosion{
+    position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden;
+  }
+  .star-piece{
+    position:absolute;font-size:24px;
+    animation:explode 1.6s cubic-bezier(.15,.7,.3,1) forwards;
+  }
+  @keyframes explode{
+    0%{transform:translate(0,0) scale(1) rotate(0deg);opacity:1}
+    100%{transform:translate(var(--dx), var(--dy)) scale(0.2) rotate(720deg);opacity:0}
+  }
+
+  @keyframes pulse{
+    0%,100%{transform:scale(1);opacity:1}
+    50%{transform:scale(1.15);opacity:.85}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-4px)}
+    75%{transform:translateX(4px)}
+  }
+  .pulse{animation:pulse 1.4s ease-in-out infinite;transform-origin:center}
+  .shake{animation:shake .35s ease}
+
+  .tri-draw{
+    stroke-dasharray:1000;
+    stroke-dashoffset:1000;
+    animation:drawLine 0.7s ease forwards;
+  }
+  @keyframes drawLine{
+    to{stroke-dashoffset:0}
+  }
+  .apex-birth{
+    animation:apexBirth 0.8s ease forwards;
+  }
+  @keyframes apexBirth{
+    0%{r:0;opacity:0}
+    60%{r:16;opacity:1}
+    100%{r:8;opacity:1}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================================================================
+     ФОН 1: диагональный водяной знак (реклама, очень мягкая)
+================================================================= -->
+<div class="bg-watermark" aria-hidden="true" id="bgWatermark"></div>
+
+<!-- ================================================================
+     ФОН 2: плавающие мини-фигуры (снизу вверх)
+================================================================= -->
+<div class="bg-particles" id="bgParticles" aria-hidden="true"></div>
+
+<!-- ================================================================
+     УГЛОВАЯ РЕКЛАМА (правый нижний угол)
+================================================================= -->
+<aside class="corner-ad" id="cornerAd" role="complementary" aria-label="Реклама">
+  <button class="corner-ad-close" id="cornerAdClose" type="button" aria-label="Свернуть">×</button>
+  <div class="corner-ad-tag">Мягкая математика</div>
+  <div class="corner-ad-title">Готовим к ОГЭ/ЕГЭ и олимпиадам</div>
+  <div class="corner-ad-text">Математика без стресса · 3–11 класс · онлайн</div>
+  <div class="corner-ad-links">
+    <a class="primary" href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">📢 Подписаться на группу</a>
+    <a href="https://vk.com/im/convo/-229273902?entrypoint=community_page&tab=all" target="_blank" rel="noopener">✉️ Написать Марии Абрамовой</a>
+  </div>
+</aside>
+
+<div class="app">
+  <header>
+    <h1>📐 Треугольники: <span>магия неравенства</span> ✨</h1>
+    <p>Двигай ползунки, предсказывай результат и собирай звёзды</p>
+
+    <div class="scorebar">
+      <div class="score-chip">✨ Очки: <b id="scoreVal">0</b></div>
+      <div class="score-chip streak">🔥 Серия: <b id="streakVal">0</b></div>
+      <div class="score-chip medal">🏅 Медали: <b id="medalsVal">0</b></div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <h2>🔺 Циркуль и линейка <small>— живая геометрия</small></h2>
+
+      <div class="challenge-bar" id="challengeBar">
+        <div class="cb-text">
+          🎯 <b>Предскажи:</b> если поставить a=<span id="predA">3</span>, b=<span id="predB">4</span>, c=<span id="predC">5</span> — треугольник получится?
+        </div>
+        <button class="predict-btn yes" id="predictYes" type="button">✓ Да</button>
+        <button class="predict-btn no" id="predictNo" type="button">✗ Нет</button>
+      </div>
+
+      <div class="viz" id="viz"></div>
+      <div class="status" id="status">Двигай ползунки — и наблюдай за магией!</div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="label">По сторонам</div>
+          <div class="value" id="typeSides">—</div>
+        </div>
+        <div class="info-item">
+          <div class="label">По углам</div>
+          <div class="value" id="typeAngles">—</div>
+        </div>
+        <div class="info-item" style="grid-column:1/-1;">
+          <div class="label">Неравенство треугольника</div>
+          <div class="value" id="ineq" style="font-family:'Comfortaa',sans-serif;font-size:.82em;">—</div>
+        </div>
+      </div>
+
+      <div class="ad-card" id="adCard">
+        <div class="ad-tag">✨ От Мягкой математики</div>
+        <div class="ad-title">Хочешь такие же открытия каждый день?</div>
+        <div class="ad-text">
+          На курсе «Сильная началка» мы разбираем геометрию не по учебнику, а через живые эксперименты. Треугольники, графы, инварианты — всё становится понятным, когда пробуешь сам.
+        </div>
+        <a class="ad-cta" href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">Узнать о курсе →</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎛️ Стороны треугольника</h2>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span><span class="dot" style="background:#8b5cf6"></span>Сторона a</span>
+          <span class="val" id="valA">3</span>
+        </div>
+        <input type="range" id="sliderA" min="1" max="12" step="0.5" value="3" aria-label="Сторона a">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span><span class="dot" style="background:#22d3ee"></span>Сторона b</span>
+          <span class="val" id="valB">4</span>
+        </div>
+        <input type="range" id="sliderB" min="1" max="12" step="0.5" value="4" aria-label="Сторона b">
+      </div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span><span class="dot" style="background:#ff8fb1"></span>Сторона c</span>
+          <span class="val" id="valC">5</span>
+        </div>
+        <input type="range" id="sliderC" min="1" max="12" step="0.5" value="5" aria-label="Сторона c">
+      </div>
+
+      <h2 style="margin-top:22px;">⚡ Быстрые примеры</h2>
+      <div class="presets">
+        <button class="preset" type="button" data-a="3" data-b="4" data-c="5">3, 4, 5 (прямоуг.)</button>
+        <button class="preset" type="button" data-a="5" data-b="5" data-c="8">5, 5, 8 (равнобедр.)</button>
+        <button class="preset" type="button" data-a="6" data-b="6" data-c="6">6, 6, 6 (равностор.)</button>
+        <button class="preset" type="button" data-a="5" data-b="5" data-c="5.5">5, 5, 5.5 (остроуг.)</button>
+        <button class="preset bad" type="button" data-a="3" data-b="4" data-c="8">3, 4, 8 ✗</button>
+        <button class="preset bad" type="button" data-a="2" data-b="3" data-c="6">2, 3, 6 ✗</button>
+        <button class="preset bad" type="button" data-a="8" data-b="3" data-c="4">8, 3, 4 ✗</button>
+        <button class="preset bad" type="button" data-a="1" data-b="2" data-c="3">1, 2, 3 (грань)</button>
+      </div>
+
+      <div class="hint">
+        💡 <b>Правило:</b> сумма любых двух сторон должна быть <b>строго больше</b> третьей.
+        Если хотя бы одно неравенство нарушено — треугольника нет.
+      </div>
+
+      <h2 style="margin-top:22px;">📜 История экспериментов</h2>
+      <div class="history" id="history">
+        <div style="opacity:.5;text-align:center;padding:14px;font-size:.85em;">Пока пусто — подвигай ползунки!</div>
+      </div>
+
+      <button class="btn secondary" type="button" onclick="resetAll()">🔄 Сбросить всё</button>
+      <button class="btn" type="button" onclick="showChallenge()">🎯 Режим «Угадай!»</button>
+    </div>
+  </div>
+
+  <div class="footer-ad">
+    <b>Мягкая математика</b> · проект развития математических способностей ·
+    готовим к <a href="https://vk.com/smartskillsmaria" target="_blank" rel="noopener">ОГЭ, ЕГЭ и олимпиадам</a> ·
+    <a href="https://vk.com/im/convo/-229273902?entrypoint=community_page&tab=all" target="_blank" rel="noopener">написать Марии Абрамовой</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+  <div class="modal">
+    <div class="medal-big" id="modalMedal">🏆</div>
+    <h3 id="modalTitle">Отличная работа!</h3>
+    <p class="modal-sub" id="modalSub">Ты настоящий геометр</p>
+
+    <div class="modal-stats">
+      <div class="stat-box"><div class="lbl">Очки</div><div class="v" id="modalScore">0</div></div>
+      <div class="stat-box"><div class="lbl">Серия</div><div class="v" id="modalStreak">0</div></div>
+      <div class="stat-box"><div class="lbl">Медали</div><div class="v" id="modalMedals">0</div></div>
+    </div>
+
+    <div class="modal-msg" id="modalMsg">
+      Ты отлично разобрался с неравенством треугольника!
+    </div>
+
+    <button class="btn" type="button" onclick="closeModal()">✨ Продолжить эксперименты</button>
+    <button class="btn secondary" type="button" onclick="resetAll();closeModal()">🔄 Начать заново</button>
+  </div>
+</div>
+
+<div class="stars-explosion" id="starsExplosion"></div>
+
+<script>
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const LS_KEY = 'mm_triangle_magic_v3';
+
+/* ========== SOUND ========== */
+let audioCtx = null;
+function getAudio(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+  }
+  return audioCtx;
+}
+function beep(freq, dur, type='sine', vol=0.08){
+  const ctx = getAudio();
+  if(!ctx) return;
+  if(ctx.state === 'suspended') ctx.resume();
+  const o = ctx.createOscillator();
+  const g = ctx.createGain();
+  o.type = type;
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0, ctx.currentTime);
+  g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime + dur + 0.02);
+}
+function soundBirth(){
+  beep(523, 0.12, 'sine', 0.09);
+  setTimeout(()=>beep(659, 0.12, 'sine', 0.09), 80);
+  setTimeout(()=>beep(784, 0.18, 'sine', 0.09), 160);
+  setTimeout(()=>beep(1046, 0.25, 'sine', 0.07), 240);
+}
+function soundBreak(){
+  beep(220, 0.15, 'triangle', 0.08);
+  setTimeout(()=>beep(150, 0.3, 'triangle', 0.06), 100);
+}
+function soundWarning(){ beep(440, 0.15, 'sine', 0.06); }
+function soundCorrect(){
+  beep(880, 0.1, 'sine', 0.1);
+  setTimeout(()=>beep(1174, 0.15, 'sine', 0.09), 90);
+  setTimeout(()=>beep(1568, 0.3, 'sine', 0.07), 180);
+}
+function soundWrong(){
+  beep(330, 0.2, 'square', 0.06);
+  setTimeout(()=>beep(220, 0.3, 'square', 0.05), 150);
+}
+
+/* ========== STATE ========== */
+const state = {
+  a: 3, b: 4, c: 5,
+  history: [],
+  score: 0,
+  streak: 0,
+  bestStreak: 0,
+  medals: 0,
+  predictions: { correct: 0, total: 0 },
+  adShown: false,
+  lastExists: null,
+  challengeActive: false,
+  achievementFirst: false,
+  achievementStreak3: false,
+  achievementStreak5: false,
+  achievementTen: false
+};
+
+const VB_W = 600, VB_H = 450;
+const CX = VB_W / 2;
+const CY = VB_H / 2 + 40;
+const BASE_SCALE = 30;
+
+const COL = {
+  a:'#8b5cf6', b:'#22d3ee', c:'#ff8fb1',
+  ok:'#4ade80', err:'#ff6b6b', warn:'#f59e0b',
+  vertex:'#ffce54'
+};
+
+/* ========== LOCALSTORAGE ========== */
+function saveState(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      score: state.score,
+      streak: state.streak,
+      bestStreak: state.bestStreak,
+      medals: state.medals,
+      predictions: state.predictions,
+      history: state.history.slice(-10),
+      achievementFirst: state.achievementFirst,
+      achievementStreak3: state.achievementStreak3,
+      achievementStreak5: state.achievementStreak5,
+      achievementTen: state.achievementTen
+    }));
+  }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    state.score = data.score || 0;
+    state.streak = data.streak || 0;
+    state.bestStreak = data.bestStreak || 0;
+    state.medals = data.medals || 0;
+    state.predictions = data.predictions || {correct:0, total:0};
+    state.history = data.history || [];
+    state.achievementFirst = !!data.achievementFirst;
+    state.achievementStreak3 = !!data.achievementStreak3;
+    state.achievementStreak5 = !!data.achievementStreak5;
+    state.achievementTen = !!data.achievementTen;
+  }catch(e){}
+}
+
+/* ========== SVG INIT ========== */
+function initSVG(){
+  const viz = document.getElementById('viz');
+  viz.innerHTML = '';
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', `0 0 ${VB_W} ${VB_H}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  svg.id = 'mainSvg';
+  viz.appendChild(svg);
+}
+function clearSVG(){
+  const svg = document.getElementById('mainSvg');
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+}
+function el(tag, attrs={}, text){
+  const e = document.createElementNS(SVG_NS, tag);
+  for(const k in attrs) e.setAttribute(k, attrs[k]);
+  if(text !== undefined) e.textContent = text;
+  return e;
+}
+
+/* ========== DRAW ========== */
+function draw(){
+  clearSVG();
+  const svg = document.getElementById('mainSvg');
+  const {a, b, c} = state;
+
+  const ok_ab = a + b > c;
+  const ok_bc = b + c > a;
+  const ok_ac = a + c > b;
+  const exists = ok_ab && ok_bc && ok_ac;
+  const degenerate = Math.abs((a + b) - c) < 0.01 || Math.abs((b + c) - a) < 0.01 || Math.abs((a + c) - b) < 0.01;
+
+  const wasExists = state.lastExists;
+  if(wasExists !== null && wasExists !== exists){
+    if(exists) soundBirth();
+    else if(!degenerate) soundBreak();
+  }
+  if(degenerate && wasExists !== 'deg') soundWarning();
+  state.lastExists = degenerate ? 'deg' : exists;
+
+  let scale = BASE_SCALE;
+  const maxSide = Math.max(a, b, c);
+  const horizLimit = (VB_W * 0.82) / maxSide;
+  const vertLimit  = (CY - 50) / Math.max(b, c, 1);
+  scale = Math.min(scale, horizLimit, vertLimit);
+
+  const aPx = a * scale, bPx = b * scale, cPx = c * scale;
+  const Ax = CX - aPx / 2, Ay = CY;
+  const Bx = CX + aPx / 2, By = CY;
+
+  let apex = null;
+  if(exists){
+    const d = aPx;
+    const aDist = (bPx * bPx - cPx * cPx + d * d) / (2 * d);
+    const hSq = bPx * bPx - aDist * aDist;
+    const h = Math.sqrt(Math.max(0, hSq));
+    apex = { x: Ax + aDist, y: Ay - h };
+  }
+
+  for(let x = 0; x <= VB_W; x += scale){
+    for(let y = 0; y <= VB_H; y += scale){
+      svg.appendChild(el('circle', {cx:x, cy:y, r:1, fill:'rgba(255,255,255,0.055)'}));
+    }
+  }
+
+  svg.appendChild(el('circle', {
+    cx:Ax, cy:Ay, r:bPx,
+    fill:'none', stroke:COL.b,
+    'stroke-width':2, 'stroke-dasharray':'6 5',
+    opacity: exists ? 0.25 : 0.55
+  }));
+  svg.appendChild(el('circle', {
+    cx:Bx, cy:By, r:cPx,
+    fill:'none', stroke:COL.c,
+    'stroke-width':2, 'stroke-dasharray':'6 5',
+    opacity: exists ? 0.25 : 0.55
+  }));
+
+  svg.appendChild(el('line', {
+    x1:Ax, y1:Ay, x2:Bx, y2:By,
+    stroke:COL.a, 'stroke-width':6, 'stroke-linecap':'round'
+  }));
+
+  if(exists && apex){
+    svg.appendChild(el('polygon', {
+      points:`${Ax},${Ay} ${Bx},${By} ${apex.x},${apex.y}`,
+      fill:'rgba(74,222,128,0.18)',
+      stroke:COL.ok, 'stroke-width':4, 'stroke-linejoin':'round',
+      class:'tri-draw'
+    }));
+    svg.appendChild(el('line', {
+      x1:Ax, y1:Ay, x2:apex.x, y2:apex.y,
+      stroke:COL.b, 'stroke-width':5, 'stroke-linecap':'round'
+    }));
+    svg.appendChild(el('line', {
+      x1:Bx, y1:By, x2:apex.x, y2:apex.y,
+      stroke:COL.c, 'stroke-width':5, 'stroke-linecap':'round'
+    }));
+
+    const apexDot = el('circle', {
+      cx:apex.x, cy:apex.y, r:8,
+      fill:COL.vertex, stroke:'#fff', 'stroke-width':2.5,
+      class: wasExists !== null && wasExists !== true && wasExists !== 'deg' ? 'apex-birth' : 'pulse'
+    });
+    svg.appendChild(apexDot);
+
+    svg.appendChild(el('text', {
+      x:(Ax + apex.x)/2 - 22, y:(Ay + apex.y)/2 + 6,
+      'text-anchor':'middle', 'font-size':20,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+      fill:COL.b, stroke:'rgba(0,0,0,0.5)', 'stroke-width':3,
+      'paint-order':'stroke'
+    }, `b=${b}`));
+    svg.appendChild(el('text', {
+      x:(Bx + apex.x)/2 + 24, y:(By + apex.y)/2 + 6,
+      'text-anchor':'middle', 'font-size':20,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+      fill:COL.c, stroke:'rgba(0,0,0,0.5)', 'stroke-width':3,
+      'paint-order':'stroke'
+    }, `c=${c}`));
+
+    drawAngleArc(svg, Ax, Ay, Bx, By, apex.x, apex.y, 28);
+    drawAngleArc(svg, Bx, By, Ax, Ay, apex.x, apex.y, 28);
+    drawAngleArc(svg, apex.x, apex.y, Ax, Ay, Bx, By, 24);
+  } else {
+    const angleA = -Math.PI/2 + 0.45;
+    const angleB = -Math.PI/2 - 0.45;
+    svg.appendChild(el('line', {
+      x1:Ax, y1:Ay,
+      x2:Ax + bPx*Math.cos(angleA),
+      y2:Ay + bPx*Math.sin(angleA),
+      stroke:COL.b, 'stroke-width':5, 'stroke-linecap':'round',
+      'stroke-dasharray':'9 5', opacity:0.5
+    }));
+    svg.appendChild(el('line', {
+      x1:Bx, y1:By,
+      x2:Bx + cPx*Math.cos(angleB),
+      y2:By + cPx*Math.sin(angleB),
+      stroke:COL.c, 'stroke-width':5, 'stroke-linecap':'round',
+      'stroke-dasharray':'9 5', opacity:0.5
+    }));
+
+    const qx = (Ax + bPx*Math.cos(angleA) + Bx + cPx*Math.cos(angleB)) / 2;
+    const qy = Math.min(Ay + bPx*Math.sin(angleA), Ay + cPx*Math.sin(angleB)) - 20;
+    const q = el('text', {
+      x:qx, y:qy,
+      'text-anchor':'middle', 'font-size':52,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+      fill:COL.err, opacity:0.7
+    }, '?');
+    q.classList.add('shake');
+    svg.appendChild(q);
+
+    svg.appendChild(el('text', {
+      x:Ax - 12, y:Ay - 14, 'text-anchor':'end', 'font-size':18,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+      fill:COL.b, opacity:0.85
+    }, `b=${b}`));
+    svg.appendChild(el('text', {
+      x:Bx + 12, y:By - 14, 'text-anchor':'start', 'font-size':18,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+      fill:COL.c, opacity:0.85
+    }, `c=${c}`));
+  }
+
+  svg.appendChild(el('circle', {cx:Ax, cy:Ay, r:6, fill:COL.a, stroke:'#fff', 'stroke-width':2}));
+  svg.appendChild(el('circle', {cx:Bx, cy:By, r:6, fill:COL.a, stroke:'#fff', 'stroke-width':2}));
+
+  svg.appendChild(el('text', {
+    x:(Ax + Bx)/2, y:Ay + 32,
+    'text-anchor':'middle', 'font-size':22,
+    'font-family':'Comfortaa, sans-serif', 'font-weight':900,
+    fill:COL.a, stroke:'rgba(0,0,0,0.5)', 'stroke-width':3,
+    'paint-order':'stroke'
+  }, `a=${a}`));
+
+  drawLegend(svg);
+  updateStatus(exists, degenerate, a, b, c);
+  updateInfo(exists, a, b, c, ok_ab, ok_bc, ok_ac);
+}
+
+function drawAngleArc(svg, vx, vy, p1x, p1y, p2x, p2y, r){
+  const a1 = Math.atan2(p1y - vy, p1x - vx);
+  const a2 = Math.atan2(p2y - vy, p2x - vx);
+  let diff = a2 - a1;
+  while(diff > Math.PI) diff -= 2*Math.PI;
+  while(diff < -Math.PI) diff += 2*Math.PI;
+  const sx = vx + r*Math.cos(a1), sy = vy + r*Math.sin(a1);
+  const ex = vx + r*Math.cos(a1+diff), ey = vy + r*Math.sin(a1+diff);
+  const sweep = diff > 0 ? 1 : 0;
+  const large = Math.abs(diff) > Math.PI ? 1 : 0;
+  svg.appendChild(el('path', {
+    d:`M ${sx} ${sy} A ${r} ${r} 0 ${large} ${sweep} ${ex} ${ey}`,
+    fill:'none', stroke:'rgba(255,255,255,0.4)', 'stroke-width':1.5
+  }));
+}
+
+function drawLegend(svg){
+  const items = [
+    {label:'a', color:COL.a},
+    {label:'b', color:COL.b},
+    {label:'c', color:COL.c}
+  ];
+  const startX = VB_W - 92, startY = 24;
+  items.forEach((it, i) => {
+    const y = startY + i*20;
+    svg.appendChild(el('circle', {cx:startX, cy:y, r:5, fill:it.color}));
+    svg.appendChild(el('text', {
+      x:startX + 12, y:y + 4, 'font-size':13,
+      'font-family':'Comfortaa, sans-serif', 'font-weight':700,
+      fill:'rgba(255,255,255,0.75)'
+    }, `сторона ${it.label}`));
+  });
+}
+
+function updateStatus(exists, degenerate, a, b, c){
+  const st = document.getElementById('status');
+  if(state.challengeActive) return;
+  if(degenerate){
+    st.className = 'status warn';
+    st.innerHTML = `⚠️ <b>На грани!</b> ${a}+${b}=${c} — треугольник «вырождается» в отрезок. Такой треугольник не существует.`;
+  } else if(exists){
+    st.className = 'status ok';
+    st.innerHTML = `✅ <b>Треугольник существует!</b> Все три неравенства выполнены.`;
+  } else {
+    const bad = [];
+    if(a + b <= c) bad.push(`${a}+${b}≤${c}`);
+    if(b + c <= a) bad.push(`${b}+${c}≤${a}`);
+    if(a + c <= b) bad.push(`${a}+${c}≤${b}`);
+    st.className = 'status err';
+    st.innerHTML = `❌ <b>Треугольник невозможен.</b> Нарушено: <b>${bad.join(', ')}</b>.`;
+  }
+}
+
+function updateInfo(exists, a, b, c, ok_ab, ok_bc, ok_ac){
+  const elSides = document.getElementById('typeSides');
+  const elAngles = document.getElementById('typeAngles');
+  const elIneq = document.getElementById('ineq');
+
+  if(exists){
+    const set = new Set([a, b, c]);
+    let sidesType = set.size === 1 ? 'Равносторонний'
+                  : set.size === 2 ? 'Равнобедренный'
+                  : 'Разносторонний';
+    elSides.innerHTML = `<span class="type-badge sides">${sidesType}</span>`;
+
+    const [x, y, z] = [a, b, c].sort((m, n) => m - n);
+    const z2 = z*z, sum2 = x*x + y*y;
+    let anglesType;
+    if(Math.abs(z2 - sum2) < 0.01) anglesType = 'Прямоугольный';
+    else if(z2 > sum2) anglesType = 'Тупоугольный';
+    else anglesType = 'Остроугольный';
+    elAngles.innerHTML = `<span class="type-badge angles">${anglesType}</span>`;
+  } else {
+    elSides.innerHTML = '<span style="opacity:.5">—</span>';
+    elAngles.innerHTML = '<span style="opacity:.5">—</span>';
+  }
+
+  const mark = ok => ok
+    ? '<span class="ok-mark">✓</span>'
+    : '<span class="err-mark">✗</span>';
+  elIneq.innerHTML = `
+    <div class="ineq-row">${mark(ok_ab)} a+b>c</div>
+    <div class="ineq-row">${mark(ok_bc)} b+c>a</div>
+    <div class="ineq-row">${mark(ok_ac)} a+c>b</div>
+  `;
+}
+
+/* ========== HISTORY ========== */
+function addHistory(prediction=null){
+  const {a, b, c} = state;
+  const ok_ab = a + b > c, ok_bc = b + c > a, ok_ac = a + c > b;
+  const exists = ok_ab && ok_bc && ok_ac;
+  const degenerate = (a + b === c) || (b + c === a) || (a + c === b);
+  const key = `${a}|${b}|${c}`;
+
+  state.history = state.history.filter(h => h.key !== key);
+  state.history.push({ key, a, b, c, exists, degenerate, prediction });
+  if(state.history.length > 15) state.history.shift();
+  renderHistory();
+  saveState();
+}
+
+function renderHistory(){
+  const el = document.getElementById('history');
+  if(state.history.length === 0){
+    el.innerHTML = '<div style="opacity:.5;text-align:center;padding:14px;font-size:.85em;">Пока пусто — подвигай ползунки!</div>';
+    return;
+  }
+  el.innerHTML = state.history.slice().reverse().map(h => {
+    let cls, icon, tag;
+    if(h.prediction !== null){
+      cls = 'predicted';
+      icon = h.prediction === h.exists ? '🎯' : '💭';
+      tag = h.prediction === h.exists ? 'угадал' : 'не угадал';
+    } else if(h.degenerate){
+      cls = 'warn'; icon = '⚠️'; tag = 'вырожденный';
+    } else if(h.exists){
+      cls = 'ok'; icon = '✅'; tag = 'существует';
+    } else {
+      cls = 'err'; icon = '❌'; tag = 'невозможен';
+    }
+    return `<div class="history-item ${cls}">
+      <span>${icon} a=${h.a}, b=${h.b}, c=${h.c}</span>
+      <span class="hi-tag">${tag}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ========== CHALLENGE ========== */
+function showChallenge(){
+  if(state.challengeActive) return;
+  const a = +(Math.random()*10 + 2).toFixed(1);
+  const b = +(Math.random()*10 + 2).toFixed(1);
+  let c;
+  if(Math.random() < 0.5){
+    c = +(Math.random() * (a+b-1) + 1).toFixed(1);
+  } else {
+    c = +(Math.min(12, a+b + Math.random()*3)).toFixed(1);
+  }
+
+  state.challengeActive = true;
+  state.challengeAnswer = { a, b, c };
+
+  const bar = document.getElementById('challengeBar');
+  document.getElementById('predA').textContent = a;
+  document.getElementById('predB').textContent = b;
+  document.getElementById('predC').textContent = c;
+  bar.classList.add('show');
+
+  document.getElementById('predictYes').disabled = false;
+  document.getElementById('predictNo').disabled = false;
+
+  const st = document.getElementById('status');
+  st.className = 'status prediction';
+  st.innerHTML = `🎯 <b>Режим «Угадай!»</b> — предскажи результат до того, как ползунки сдвинутся.`;
+}
+
+function answerPrediction(userSays){
+  const {a, b, c} = state.challengeAnswer;
+  const ok_ab = a + b > c, ok_bc = b + c > a, ok_ac = a + c > b;
+  const exists = ok_ab && ok_bc && ok_ac;
+
+  state.predictions.total++;
+  const correct = userSays === exists;
+
+  if(correct){
+    state.predictions.correct++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    const points = 10 + Math.min(state.streak * 2, 20);
+    state.score += points;
+    state.medals += 1;
+    soundCorrect();
+    showStars(20);
+    const st = document.getElementById('status');
+    st.className = 'status ok result-correct';
+    st.innerHTML = `🎉 <b>Верно!</b> +${points} очков. ${exists ? 'Треугольник есть' : 'Треугольника нет'} — ты угадал(а)!`;
+  } else {
+    state.streak = 0;
+    soundWrong();
+    const st = document.getElementById('status');
+    st.className = 'status err result-wrong';
+    st.innerHTML = `💭 <b>Почти!</b> ${exists ? 'Треугольник существует' : 'Треугольника не существует'}. Серия сброшена — но опыт остался!`;
+  }
+
+  document.getElementById('predictYes').disabled = true;
+  document.getElementById('predictNo').disabled = true;
+
+  document.getElementById('sliderA').value = a;
+  document.getElementById('sliderB').value = b;
+  document.getElementById('sliderC').value = c;
+  state.a = a; state.b = b; state.c = c;
+  document.getElementById('valA').textContent = a;
+  document.getElementById('valB').textContent = b;
+  document.getElementById('valC').textContent = c;
+  draw();
+  addHistory(userSays);
+  updateScoreUI();
+  saveState();
+
+  setTimeout(()=>{
+    state.challengeActive = false;
+    document.getElementById('challengeBar').classList.remove('show');
+    checkAchievements();
+    maybeShowAd();
+  }, 1800);
+}
+
+function updateScoreUI(){
+  document.getElementById('scoreVal').textContent = state.score;
+  document.getElementById('streakVal').textContent = state.streak;
+  document.getElementById('medalsVal').textContent = state.medals;
+}
+
+function checkAchievements(){
+  if(state.predictions.total === 1 && !state.achievementFirst){
+    state.achievementFirst = true;
+  }
+  if(state.streak >= 3 && !state.achievementStreak3){
+    state.achievementStreak3 = true;
+    showResultModal({
+      medal:'🥉',
+      title:'Серия из 3!',
+      sub:'Хорошее начало',
+      msg:'Ты угадал(а) три раза подряд. Продолжай — серия из 5 даёт бонус!'
+    });
+    return;
+  }
+  if(state.streak >= 5 && !state.achievementStreak5){
+    state.achievementStreak5 = true;
+    showResultModal({
+      medal:'🥇',
+      title:'Серия из 5!',
+      sub:'Настоящий геометр',
+      msg:'Ты предсказал(а) 5 результатов подряд. Это уже уровень «Кенгуру»!'
+    });
+    return;
+  }
+  if(state.predictions.correct >= 10 && !state.achievementTen){
+    state.achievementTen = true;
+    showResultModal({
+      medal:'🏆',
+      title:'10 правильных!',
+      sub:'Мастер неравенства',
+      msg:'Ты разобрался(ась) в неравенстве треугольника. Это уровень ВсОШ!'
+    });
+    return;
+  }
+}
+
+function maybeShowAd(){
+  if(state.predictions.total >= 2 && !state.adShown){
+    state.adShown = true;
+    document.getElementById('adCard').classList.add('show');
+  }
+}
+
+/* ========== MODAL ========== */
+function showResultModal({medal, title, sub, msg}){
+  document.getElementById('modalMedal').textContent = medal;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalSub').textContent = sub;
+  document.getElementById('modalScore').textContent = state.score;
+  document.getElementById('modalStreak').textContent = state.bestStreak;
+  document.getElementById('modalMedals').textContent = state.medals;
+  document.getElementById('modalMsg').textContent = msg;
+  document.getElementById('resultModal').classList.add('show');
+  showStars(40);
+}
+
+function closeModal(){
+  document.getElementById('resultModal').classList.remove('show');
+}
+
+/* ========== STARS ========== */
+function showStars(count=25){
+  const box = document.getElementById('starsExplosion');
+  const icons = ['⭐','✨','🌟','💫','🎉','🏅','🎯','💎','🦄','👑'];
+  const cx = window.innerWidth/2;
+  const cy = window.innerHeight/2;
+
+  for(let i=0; i<count; i++){
+    const s = document.createElement('div');
+    s.className = 'star-piece';
+    s.textContent = icons[Math.floor(Math.random()*icons.length)];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 200 + Math.random() * 400;
+    s.style.left = cx + 'px';
+    s.style.top = cy + 'px';
+    s.style.setProperty('--dx', (Math.cos(angle)*dist) + 'px');
+    s.style.setProperty('--dy', (Math.sin(angle)*dist) + 'px');
+    s.style.fontSize = (16 + Math.random()*20) + 'px';
+    s.style.animationDelay = (Math.random()*0.3) + 's';
+    box.appendChild(s);
+    setTimeout(() => s.remove(), 2200);
+  }
+}
+
+/* ========== SLIDERS ========== */
+function setupSliders(){
+  const sA = document.getElementById('sliderA');
+  const sB = document.getElementById('sliderB');
+  const sC = document.getElementById('sliderC');
+  const vA = document.getElementById('valA');
+  const vB = document.getElementById('valB');
+  const vC = document.getElementById('valC');
+
+  let timer = null;
+  function update(){
+    if(state.challengeActive) return;
+    state.a = +sA.value;
+    state.b = +sB.value;
+    state.c = +sC.value;
+    vA.textContent = state.a;
+    vB.textContent = state.b;
+    vC.textContent = state.c;
+    draw();
+    clearTimeout(timer);
+    timer = setTimeout(()=>{
+      addHistory();
+      maybeShowAd();
+    }, 700);
+  }
+
+  [sA, sB, sC].forEach(s => s.addEventListener('input', update));
+
+  document.querySelectorAll('.preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sA.value = btn.dataset.a;
+      sB.value = btn.dataset.b;
+      sC.value = btn.dataset.c;
+      update();
+    });
+  });
+}
+
+function resetAll(){
+  if(!confirm('Сбросить весь прогресс: очки, серии, медали и историю?')) return;
+  state.score = 0;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.medals = 0;
+  state.predictions = { correct: 0, total: 0 };
+  state.history = [];
+  state.adShown = false;
+  state.achievementFirst = false;
+  state.achievementStreak3 = false;
+  state.achievementStreak5 = false;
+  state.achievementTen = false;
+
+  document.getElementById('sliderA').value = 3;
+  document.getElementById('sliderB').value = 4;
+  document.getElementById('sliderC').value = 5;
+  state.a = 3; state.b = 4; state.c = 5;
+  document.getElementById('valA').textContent = 3;
+  document.getElementById('valB').textContent = 4;
+  document.getElementById('valC').textContent = 5;
+
+  document.getElementById('adCard').classList.remove('show');
+  document.getElementById('challengeBar').classList.remove('show');
+  state.challengeActive = false;
+
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+
+  draw();
+  renderHistory();
+  updateScoreUI();
+}
+
+/* ================================================================
+   ФОН: плавающие мини-фигуры (исправлено — реально снизу вверх)
+================================================================= */
+function initBgFigures(){
+  const box = document.getElementById('bgParticles');
+  box.innerHTML = '';
+
+  // Настоящие геометрические фигуры (Unicode), без "мусорных" символов
+  const figures = [
+    {ch:'△', color:'#8b5cf6'},
+    {ch:'▲', color:'#ffce54'},
+    {ch:'□', color:'#22d3ee'},
+    {ch:'■', color:'#ff8fb1'},
+    {ch:'○', color:'#4ade80'},
+    {ch:'●', color:'#8b5cf6'},
+    {ch:'◇', color:'#22d3ee'},
+    {ch:'◆', color:'#ffce54'},
+    {ch:'⬡', color:'#ff8fb1'},
+    {ch:'⬢', color:'#8b5cf6'},
+    {ch:'★', color:'#ffce54'},
+    {ch:'☆', color:'#22d3ee'},
+    {ch:'⬠', color:'#4ade80'},
+    {ch:'▱', color:'#ff8fb1'},
+    {ch:'◁', color:'#8b5cf6'},
+    {ch:'▷', color:'#22d3ee'},
+    {ch:'◯', color:'#4ade80'},
+    {ch:'▣', color:'#ffce54'}
+  ];
+
+  const isMobile = window.innerWidth < 600;
+  const COUNT = isMobile ? 12 : 22;
+
+  for(let i=0; i<COUNT; i++){
+    const f = figures[Math.floor(Math.random()*figures.length)];
+    const el = document.createElement('span');
+    el.className = 'bg-fig';
+    el.textContent = f.ch;
+    el.style.color = f.color;
+    el.style.left = (Math.random()*100).toFixed(2) + '%';
+    el.style.fontSize = (isMobile ? 18 : 22) + Math.random()*24 + 'px';
+
+    // Прозрачность 10-18% — заметно, но не мешает
+    el.style.setProperty('--op', (0.10 + Math.random()*0.08).toFixed(2));
+
+    // Горизонтальный дрейф при подъёме (-80...80px)
+    el.style.setProperty('--drift', ((Math.random()*160 - 80)|0) + 'px');
+
+    // Вращение 180-540 градусов за весь путь
+    el.style.setProperty('--rot', (180 + Math.random()*360)|0 + 'deg');
+
+    // Скорость: 22-45 секунд на полный подъём
+    const dur = 22 + Math.random()*23;
+    el.style.animationDuration = dur.toFixed(1) + 's';
+
+    // Случайная задержка, чтобы не появлялись одновременно
+    el.style.animationDelay = (-Math.random()*dur).toFixed(1) + 's';
+
+    box.appendChild(el);
+  }
+}
+
+/* ================================================================
+   ФОН: диагональный водяной знак (реклама)
+================================================================= */
+function initWatermark(){
+  const box = document.getElementById('bgWatermark');
+  box.innerHTML = '';
+
+  // Повторяющиеся строки рекламы — очень низкая opacity (5.5%), не мешает
+  const lines = [
+    'МЯГКАЯ МАТЕМАТИКА',
+    'ПОДГОТОВКА К ОГЭ · ЕГЭ',
+    'ОЛИМПИАДЫ · 3–11 КЛАСС',
+    'VK.COM/SMARTSKILLSMARIA',
+    'МАРИЯ АБРАМОВА'
+  ];
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  // Наклон -25°, шаг по вертикали ~130px, по горизонтали ~ 420px
+  const diag = Math.sqrt(w*w + h*h);
+  const cols = Math.ceil(diag / 420) + 2;
+  const rows = Math.ceil(diag / 130) + 2;
+
+  for(let r = -2; r < rows; r++){
+    for(let c = -2; c < cols; c++){
+      const line = document.createElement('div');
+      line.className = 'bg-wm-line';
+      // Собираем из 2 случайных фраз для разнообразия
+      const phrase1 = lines[(r*3 + c*2) % lines.length];
+      const phrase2 = lines[(r*2 + c*3 + 1) % lines.length];
+      line.innerHTML = `${phrase1}<span class="dot-sep">·</span>${phrase2}`;
+      line.style.left = (c * 420) + 'px';
+      line.style.top = (r * 130) + 'px';
+      box.appendChild(line);
+    }
+  }
+}
+
+/* ========== CORNER AD ========== */
+function initCornerAd(){
+  const ad = document.getElementById('cornerAd');
+  const closeBtn = document.getElementById('cornerAdClose');
+
+  closeBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ad.classList.toggle('collapsed');
+    if(ad.classList.contains('collapsed')){
+      closeBtn.textContent = '×';
+    }
+  });
+
+  // Клик по свёрнутой карточке — развернуть
+  ad.addEventListener('click', (e) => {
+    if(ad.classList.contains('collapsed')){
+      ad.classList.remove('collapsed');
+    }
+  });
+}
+
+/* ========== BOOT ========== */
+document.addEventListener('DOMContentLoaded', () => {
+  initBgFigures();
+  initWatermark();
+  initCornerAd();
+
+  initSVG();
+  loadState();
+  updateScoreUI();
+  renderHistory();
+
+  document.getElementById('valA').textContent = state.a;
+  document.getElementById('valB').textContent = state.b;
+  document.getElementById('valC').textContent = state.c;
+  document.getElementById('sliderA').value = state.a;
+  document.getElementById('sliderB').value = state.b;
+  document.getElementById('sliderC').value = state.c;
+
+  setupSliders();
+
+  document.getElementById('predictYes').addEventListener('click', () => answerPrediction(true));
+  document.getElementById('predictNo').addEventListener('click', () => answerPrediction(false));
+
+  document.getElementById('resultModal').addEventListener('click', (e) => {
+    if(e.target.id === 'resultModal') closeModal();
+  });
+
+  draw();
+});
+
+// При ресайзе окна — пересобрать водяной знак
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(initWatermark, 400);
+});
+</script>
+</body>
+</html>
